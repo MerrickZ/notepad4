@@ -140,6 +140,18 @@ jobs:
       with:
           name: Notepad4_MSVC2022_en_ARM
           path: 'build\Notepad4_ARM_*.zip'
+    
+    - name: Winget Publish
+      uses: isaacrlevin/winget-publish-action@1.0
+      with:
+        publish-type: "Update"
+        user: "zufuliu"
+        package: "notepad4"
+        version: "%GIT_TAG_NAME%"
+        x64: "build\Notepad4_i18n_x64_*.zip"
+        ARM64: "build\Notepad4_i18n_ARM64_*.zip"
+        Win32: "build\Notepad4_i18n_Win32_*.zip"
+        token: ${{ secrets.WINGETCREATE_TOKEN }}
 
   llvm_msvc2019:
     name: LLVM (Visual C++ 2019)
