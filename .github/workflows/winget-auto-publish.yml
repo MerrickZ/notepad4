@@ -26,7 +26,7 @@ jobs:
           $installerX64Url = 		$targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_i18n_x64*' | Select -ExpandProperty browser_download_url
           $installerX86Url = 		$targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_i18n_Win32*' | Select -ExpandProperty browser_download_url
           $installerARM64Url = 	$targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_i18n_ARM64*' | Select -ExpandProperty browser_download_url
-          $installerARMUrl = 	  $targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_i18n_ARM_*' | Select -ExpandProperty browser_download_url
+          $installerARMUrl = 	  $targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_i18n_ARM__*' | Select -ExpandProperty browser_download_url
           
           $ver = $targetRelease.tag_name -ireplace '^v'
           # getting latest wingetcreate file
