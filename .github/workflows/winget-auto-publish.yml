@@ -18,7 +18,7 @@ jobs:
           $wingetPackage = "zufuliu.notepad4"
           $gitToken = "${{ secrets.PT_WINGET }}"
 
-          $github = Invoke-RestMethod -uri "https://github.com/zufuliu/notepad4/releases" 
+          $github = Invoke-RestMethod -uri "https://api.github.com/repos/zufuliu/notepad4/releases" 
 
           $targetRelease = $github | Where-Object -Property name -match 'Release'| Select -First 1
           $installerX64Url = 		$targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_i18n_x64*' | Select -ExpandProperty browser_download_url
