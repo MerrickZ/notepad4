@@ -1,0 +1,33 @@
+name: WinGet submission on release
+# based off of https://github.com/nushell/nushell/blob/main/.github/workflows/winget-submission.yml
+# Modified by MerrickZ
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  winget:
+    name: Publish winget package
+    runs-on: windows-latest
+    steps:
+      - name: Submit Notepad4 package to Windows Package Manager Community Repository
+        run: |
+
+          $wingetPackage = "zufuliu.notepad4"
+          $gitToken = "${{ secrets.PT_WINGET }}"
+
+          $github = Invoke-RestMethod -uri "https://github.com/zufuliu/notepad4/releases" 
+
+          $targetRelease = $github | Where-Object -Property name -match 'Release'| Select -First 1
+          $installerX64Url = $targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_i18n_x64*' | Select -ExpandProperty browser_download_url
+          $installerX86Url = $targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_i18n_Win32*' | Select -ExpandProperty browser_download_url
+          $installerARM64Url = $targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_i18n_ARM64*' | Select -ExpandProperty browser_download_url
+          $installerARMUrl = $targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_i18n_ARM_*' | Select -ExpandProperty browser_download_url
+          
+          $ver = $targetRelease.tag_name -ireplace '^v'
+
+          # getting latest wingetcreate file
+          iwr https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
+          .\wingetcreate.exe update $wingetPackage -s -v $ver -u "$installerX64Url|x64" "$installerX86Url|x86" "$installerARM64Url|arm64" "$installerARMUrl|arm" -t $gitToken
