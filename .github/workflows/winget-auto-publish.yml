@@ -1,4 +1,4 @@
-name: WinGet submission on release
+name: WinGet Submission on Release
 # based off of https://github.com/nushell/nushell/blob/main/.github/workflows/winget-submission.yml
 # based off of https://github.com/microsoft/PowerToys/blob/main/.github/workflows/package-submissions.yml
 # Modified by MerrickZ
@@ -29,6 +29,7 @@ jobs:
           $installerARMUrl = 	  $targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_i18n_ARM__*' | Select -ExpandProperty browser_download_url
           
           $ver = $targetRelease.tag_name -ireplace '^v'
+          $publish_date = $targetRelease.published_at -ireplace "-" -ireplace "T.*"
           # getting latest wingetcreate file
           iwr https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
-          .\wingetcreate update $wingetPackage -s -v $ver -u "$installerX64Url|x64" "$installerX86Url|x86" "$installerARM64Url|arm64" "$installerARMUrl|arm" -t $gitToken
+          .\wingetcreate update $wingetPackage -s -v $ver -u "$installerX64Url|x64" "$installerX86Url|x86" "$installerARM64Url|arm64" "$installerARMUrl|arm" -t $gitToken --release-notes-url "$targetRelease.html_url" --release-date "$publish_date"
