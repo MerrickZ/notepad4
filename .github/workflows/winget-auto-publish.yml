@@ -33,6 +33,10 @@ jobs:
           $i_arm64_en =$targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_en_ARM64_*' | Select -ExpandProperty browser_download_url
           $i_x86_en =$targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_en_Win32_*' | Select -ExpandProperty browser_download_url
           $i_x64_en =$targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_en_x64_*' | Select -ExpandProperty browser_download_url
+          
+          $i_arm64_fr =$targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_fr_ARM64_*' | Select -ExpandProperty browser_download_url
+          $i_x86_fr =$targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_fr_Win32_*' | Select -ExpandProperty browser_download_url
+          $i_x64_fr =$targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_fr_x64_*' | Select -ExpandProperty browser_download_url
            
           $i_arm64_it =$targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_it_ARM64_*' | Select -ExpandProperty browser_download_url
           $i_x86_it =$targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_it_Win32_*' | Select -ExpandProperty browser_download_url
@@ -55,6 +59,7 @@ jobs:
           $i_x64_tc =$targetRelease | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match 'Notepad4_zh-Hant_x64_*' | Select -ExpandProperty browser_download_url
           
           $ver = $targetRelease.tag_name -ireplace '^v'
+          $publish_date = $targetRelease.published_at -ireplace "T.*"
           # getting latest wingetcreate file
           iwr https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
-          .\wingetcreate update $wingetPackage -s -v $ver -urls "$installerX64Url" "$installerX86Url" "$installerARM64Url" "$installerARMUrl" "$i_ARM_en" "$i_arm64_en" "$i_x86_en" "$i_x64_en"  "$i_arm64_it" "$i_x86_it" "$i_x64_it"  "$i_arm64_ja" "$i_x86_ja" "$i_x64_ja"  "$i_arm64_ko" "$i_x86_ko" "$i_x64_ko" "$i_arm64_sc" "$i_x86_sc" "$i_x64_sc" "$i_arm64_tc" "$i_x86_tc" "$i_x64_tc" -t $gitToken
+          .\wingetcreate update $wingetPackage -s -v $ver -u "$installerX64Url|x64" "$installerX86Url|x86" "$installerARM64Url|arm64" "$installerARMUrl|arm" "$i_ARM_en|arm|en" "$i_arm64_en|arm64|en" "$i_x86_en|x86|en" "$i_x64_en|x64|en"  "$i_arm64_fr|arm64|fr" "$i_x86_fr|x86|fr" "$i_x64_fr|x64|fr" "$i_arm64_it|arm64|it" "$i_x86_it|x86|it" "$i_x64_it|x64|it"  "$i_arm64_ja|arm64|ja" "$i_x86_ja|x86|ja" "$i_x64_ja|x64|ja"  "$i_arm64_ko|arm64|ko" "$i_x86_ko|x86|ko" "$i_x64_ko|x64|ko" "$i_arm64_sc|arm64|zh-Hans" "$i_x86_sc|x86|zh-Hans" "$i_x64_sc|x64|zh-Hans" "$i_arm64_tc|arm64|zh-Hant" "$i_x86_tc|x86|zh-Hant" "$i_x64_tc|x64|zh-Hant" -t $gitToken --release-notes-url $targetRelease.html_url --release-date $publish_date
