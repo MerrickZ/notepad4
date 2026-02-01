@@ -27,7 +27,8 @@ jobs:
 
     - name: Build project
       run: |
-        msbuild build/VisualStudio/Notepad4.sln /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /verbosity:minimal
+        $outDir = "build/bin/${{ matrix.configuration }}/${{ matrix.platform }}"
+        msbuild build/VisualStudio/Notepad4.sln /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /p:OutDir=$outDir\ /verbosity:minimal
 
     - name: Debug - List directory structure after build
       run: |
