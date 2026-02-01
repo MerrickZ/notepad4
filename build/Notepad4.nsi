@@ -8,7 +8,7 @@
 !include "MUI2.nsh"
 
 !define MUI_ABORTWARNING
-!define MUI_ICON "res\\Notepad4.ico"
+!define MUI_ICON "..\\res\\Notepad4.ico"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\uninstall.ico"
 
 !insertmacro MUI_PAGE_DIRECTORY
