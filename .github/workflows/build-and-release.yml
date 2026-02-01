@@ -65,6 +65,10 @@ jobs:
           exit 1
         }
 
+    - name: Debug - List output directory contents
+      run: |
+        Get-ChildItem -Path "output/${{ matrix.platform }}" -File | Select-Object Name
+
     - name: Build NSIS installer
       run: |
         $platform = "${{ matrix.platform }}"
