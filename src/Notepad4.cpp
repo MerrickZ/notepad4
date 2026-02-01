@@ -1855,6 +1855,13 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	mruFile.Init(MRU_KEY_RECENT_FILES, iMaxRecentFiles, flags);
 	mruFind.Init(MRU_KEY_RECENT_FIND, MRU_MAXITEMS, MRUFlags_QuoteValue);
 	mruReplace.Init(MRU_KEY_RECENT_REPLACE, MRU_MAXITEMS, MRUFlags_QuoteValue);
+
+	// Enable Windows 11 modern theme support
+	if (IsAppThemed()) {
+		// Set window theme to use Windows 11 styles
+		SetWindowTheme(hwnd, L"Explorer", nullptr);
+	}
+
 	return 0;
 }
 
@@ -1864,11 +1871,16 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 //
 //
 void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
-	constexpr DWORD dwToolbarStyle = WS_TOOLBAR;
+	constexpr DWORD dwToolbarStyle = WS_TOOLBAR | TBSTYLE_FLAT;
 	hwndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, nullptr, dwToolbarStyle,
-								 0, 0, 0, 0, hwnd, AsPointer<HMENU, ULONG_PTR>(IDC_TOOLBAR), hInstance, nullptr);
+						 0, 0, 0, 0, hwnd, AsPointer<HMENU, ULONG_PTR>(IDC_TOOLBAR), hInstance, nullptr);
 
 	SendMessage(hwndToolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
+
+	// Enable Windows 11 modern theme for toolbar
+	if (IsAppThemed()) {
+		SetWindowTheme(hwndToolbar, L"Explorer", nullptr);
+	}
 
 	bool internalBitmap = false;
 	const int scale = iAutoScaleToolbar;
@@ -1959,10 +1971,20 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	const DWORD dwStatusbarStyle = bShowStatusbar ? (WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE) : (WS_CHILD | WS_CLIPSIBLINGS);
 	hwndStatus = CreateStatusWindow(dwStatusbarStyle, nullptr, hwnd, IDC_STATUSBAR);
 
+	// Enable Windows 11 modern theme for statusbar
+	if (IsAppThemed()) {
+		SetWindowTheme(hwndStatus, L"Explorer", nullptr);
+	}
+
 	// Create ReBar and add Toolbar
 	const DWORD dwReBarStyle = bShowToolbar ? (WS_REBAR | WS_VISIBLE) : WS_REBAR;
 	hwndReBar = CreateWindowEx(WS_EX_TOOLWINDOW, REBARCLASSNAME, nullptr, dwReBarStyle,
-							   0, 0, 0, 0, hwnd, AsPointer<HMENU, ULONG_PTR>(IDC_REBAR), hInstance, nullptr);
+						   0, 0, 0, 0, hwnd, AsPointer<HMENU, ULONG_PTR>(IDC_REBAR), hInstance, nullptr);
+
+	// Enable Windows 11 modern theme for ReBar
+	if (IsAppThemed()) {
+		SetWindowTheme(hwndReBar, L"Explorer", nullptr);
+	}
 
 	REBARINFO rbi;
 	rbi.cbSize = sizeof(REBARINFO);
