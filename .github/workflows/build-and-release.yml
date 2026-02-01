@@ -23,7 +23,9 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Setup NSIS
-      uses: joncloud/makensis-action@v3
+      run: |
+        choco install nsis -y
+        echo "C:\Program Files (x86)\NSIS" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
     - name: Build project
       run: |
