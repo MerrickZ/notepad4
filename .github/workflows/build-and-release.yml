@@ -29,16 +29,40 @@ jobs:
       run: |
         msbuild build/VisualStudio/Notepad4.sln /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /verbosity:minimal
 
+    - name: Debug - List directory structure after build
+      run: |
+        Get-ChildItem -Path "." -Recurse -File | Where-Object { $_.Name -match "\.exe$" } | Select-Object FullName
+
     - name: Create output directory
       run: |
         New-Item -ItemType Directory -Path "output/${{ matrix.platform }}" -Force
 
     - name: Copy built files
       run: |
-        $srcDir = "bin/${{ matrix.configuration }}/${{ matrix.platform }}"
-        $destDir = "output/${{ matrix.platform }}"
-        Copy-Item -Path "$srcDir\Notepad4.exe" -Destination "$destDir"
-        Copy-Item -Path "$srcDir\matepath.exe" -Destination "$destDir"
+        # Try different possible output directories
+        $possibleDirs = @(
+          "bin/${{ matrix.configuration }}/${{ matrix.platform }}",
+          "build/VisualStudio/${{ matrix.configuration }}/${{ matrix.platform }}",
+          "${{ matrix.configuration }}/${{ matrix.platform }}"
+        )
+        
+        $srcDir = $null
+        foreach ($dir in $possibleDirs) {
+          if (Test-Path "$dir\Notepad4.exe") {
+            $srcDir = $dir
+            break
+          }
+        }
+        
+        if ($srcDir) {
+          Write-Host "Found Notepad4.exe in: $srcDir"
+          $destDir = "output/${{ matrix.platform }}"
+          Copy-Item -Path "$srcDir\Notepad4.exe" -Destination "$destDir"
+          Copy-Item -Path "$srcDir\matepath.exe" -Destination "$destDir"
+        } else {
+          Write-Error "Could not find Notepad4.exe in any of the possible directories"
+          exit 1
+        }
 
     - name: Build NSIS installer
       run: |
