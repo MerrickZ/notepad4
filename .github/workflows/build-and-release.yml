@@ -1,0 +1,89 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        platform: [Win32, x64, ARM64]
+        configuration: [Release]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NSIS
+      uses: joncloud/makensis-action@v3
+
+    - name: Build project
+      run: |
+        msbuild build/VisualStudio/Notepad4.sln /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /verbosity:minimal
+
+    - name: Create output directory
+      run: |
+        New-Item -ItemType Directory -Path "output/${{ matrix.platform }}" -Force
+
+    - name: Copy built files
+      run: |
+        $srcDir = "build/VisualStudio/${{ matrix.configuration }}/${{ matrix.platform }}"
+        $destDir = "output/${{ matrix.platform }}"
+        Copy-Item -Path "$srcDir\Notepad4.exe" -Destination "$destDir"
+        Copy-Item -Path "$srcDir\matepath.exe" -Destination "$destDir"
+
+    - name: Build NSIS installer
+      run: |
+        $platform = "${{ matrix.platform }}"
+        $arch = if ($platform -eq "Win32") { "x86" } elseif ($platform -eq "x64") { "x64" } else { "arm64" }
+        $version = if ("${{ github.ref }}" -like "refs/tags/*") { "${{ github.ref_name }}" } else { "dev" }
+        $outputFile = "output\Notepad4-${version}-${arch}.exe"
+        $sourceDir = "output\${platform}"
+        
+        makensis /DVERSION="$version" /DARCH="$arch" /DOUTPUT_FILE="$outputFile" /DSOURCE_DIR="$sourceDir" build\Notepad4.nsi
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: Notepad4-${{ matrix.platform }}
+        path: output/Notepad4-*.exe
+
+  release:
+    needs: build
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Create release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          artifacts/**/*.exe
+        name: Release ${{ github.ref_name }}
+        body: |
+          ## Notepad4 ${{ github.ref_name }}
+          
+          ### Changes
+          - See commit history for details
+          
+          ### Download
+          - Windows x86: Notepad4-${{ github.ref_name }}-x86.exe
+          - Windows x64: Notepad4-${{ github.ref_name }}-x64.exe
+          - Windows ARM64: Notepad4-${{ github.ref_name }}-arm64.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
