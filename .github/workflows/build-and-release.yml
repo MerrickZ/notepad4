@@ -41,6 +41,7 @@ jobs:
       run: |
         # Try different possible output directories
         $possibleDirs = @(
+          "build/bin/${{ matrix.configuration }}/${{ matrix.platform }}",
           "bin/${{ matrix.configuration }}/${{ matrix.platform }}",
           "build/VisualStudio/${{ matrix.configuration }}/${{ matrix.platform }}",
           "${{ matrix.configuration }}/${{ matrix.platform }}"
