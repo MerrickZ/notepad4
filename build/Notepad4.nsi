@@ -57,59 +57,18 @@ Section "Notepad4 Main Program" SEC_MAIN
 SectionEnd
 
 Section "Language Packs" SEC_LOCALE
-  ; Build locale path using ARCH variable
-  ; Actual locale path: build\bin\Release\{platform}\locale\
+  ; Use locale directory from SOURCE_DIR (already copied by previous step)
+  ; SOURCE_DIR points to output/{platform} which contains locale subdirectory
   
-  ; Set base directory for locales
-  !define LOCALE_BASE_DIR "..\build\bin\Release"
+  ; Check if locale directory exists
+  IfFileExists "${SOURCE_DIR}\locale" +2 0
+  Goto end_locale_section
   
-  ; Determine platform directory based on ARCH variable
-  !ifdef ARCH
-    !if "${ARCH}" == "x86"
-      !define PLATFORM_DIR "Win32"
-    !elseif "${ARCH}" == "x64"
-      !define PLATFORM_DIR "x64"
-    !elseif "${ARCH}" == "arm64"
-      !define PLATFORM_DIR "ARM64"
-    !else
-      !define PLATFORM_DIR "Win32"
-    !endif
-  !else
-    !define PLATFORM_DIR "Win32"
-  !endif
+  ; Copy entire locale directory recursively
+  SetOutPath "$INSTDIR"
+  File /r "${SOURCE_DIR}\locale\*"
   
-  ; Build full locale directory path
-  !define LOCALE_FULL_DIR "${LOCALE_BASE_DIR}\${PLATFORM_DIR}\locale"
-  
-  SetOutPath "$INSTDIR\locale\de"
-  File /r "${LOCALE_FULL_DIR}\de\*.dll"
-  
-  SetOutPath "$INSTDIR\locale\fr"
-  File /r "${LOCALE_FULL_DIR}\fr\*.dll"
-  
-  SetOutPath "$INSTDIR\locale\it"
-  File /r "${LOCALE_FULL_DIR}\it\*.dll"
-  
-  SetOutPath "$INSTDIR\locale\ja"
-  File /r "${LOCALE_FULL_DIR}\ja\*.dll"
-  
-  SetOutPath "$INSTDIR\locale\ko"
-  File /r "${LOCALE_FULL_DIR}\ko\*.dll"
-  
-  SetOutPath "$INSTDIR\locale\pl"
-  File /r "${LOCALE_FULL_DIR}\pl\*.dll"
-  
-  SetOutPath "$INSTDIR\locale\pt-BR"
-  File /r "${LOCALE_FULL_DIR}\pt-BR\*.dll"
-  
-  SetOutPath "$INSTDIR\locale\ru"
-  File /r "${LOCALE_FULL_DIR}\ru\*.dll"
-  
-  SetOutPath "$INSTDIR\locale\zh-Hans"
-  File /r "${LOCALE_FULL_DIR}\zh-Hans\*.dll"
-  
-  SetOutPath "$INSTDIR\locale\zh-Hant"
-  File /r "${LOCALE_FULL_DIR}\zh-Hant\*.dll"
+end_locale_section:
 SectionEnd
 
 ; Component descriptions

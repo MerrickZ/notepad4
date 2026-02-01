@@ -41,29 +41,22 @@ jobs:
 
     - name: Copy built files
       run: |
-        # Try different possible output directories
-        $possibleDirs = @(
-          "build/bin/${{ matrix.configuration }}/${{ matrix.platform }}",
-          "bin/${{ matrix.configuration }}/${{ matrix.platform }}",
-          "build/VisualStudio/${{ matrix.configuration }}/${{ matrix.platform }}",
-          "${{ matrix.configuration }}/${{ matrix.platform }}"
-        )
+        # Use the exact output directory we specified in msbuild
+        $srcDir = "build/bin/${{ matrix.configuration }}/${{ matrix.platform }}"
+        $destDir = "output/${{ matrix.platform }}"
         
-        $srcDir = $null
-        foreach ($dir in $possibleDirs) {
-          if (Test-Path "$dir\Notepad4.exe") {
-            $srcDir = $dir
-            break
-          }
-        }
-        
-        if ($srcDir) {
+        if (Test-Path "$srcDir\Notepad4.exe") {
           Write-Host "Found Notepad4.exe in: $srcDir"
-          $destDir = "output/${{ matrix.platform }}"
           Copy-Item -Path "$srcDir\Notepad4.exe" -Destination "$destDir"
           Copy-Item -Path "$srcDir\matepath.exe" -Destination "$destDir"
+          # Also copy locale folder if it exists
+          if (Test-Path "$srcDir\locale") {
+            Copy-Item -Path "$srcDir\locale" -Destination "$destDir" -Recurse
+          }
         } else {
-          Write-Error "Could not find Notepad4.exe in any of the possible directories"
+          Write-Error "Could not find Notepad4.exe in $srcDir"
+          # List directory structure for debugging
+          Get-ChildItem -Path "." -Recurse -File | Where-Object { $_.Name -match "\.exe$" } | Select-Object FullName
           exit 1
         }
 

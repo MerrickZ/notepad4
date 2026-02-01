@@ -39,19 +39,6 @@
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Release' or '$(Configuration)'=='AVX2Release' or '$(Configuration)'=='AVX512Release'" Label="Configuration">
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(Configuration.EndsWith('LLVMRelease'))" Label="Configuration">
-    <UseDebugLibraries>false</UseDebugLibraries>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='AVX2Debug' or '$(Configuration)'=='AVX512Debug'" Label="Configuration">
-    <UseDebugLibraries>true</UseDebugLibraries>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(Configuration.EndsWith('LLVMDebug'))" Label="Configuration">
-    <UseDebugLibraries>true</UseDebugLibraries>
-  </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
@@ -75,8 +62,6 @@
   <PropertyGroup>
     <LinkIncremental Condition="$(Configuration.EndsWith('Debug'))">true</LinkIncremental>
     <LinkIncremental Condition="$(Configuration.EndsWith('Release'))">false</LinkIncremental>
-    <OutDir Condition="!$(Configuration.StartsWith('AVX'))">$(SolutionDir)..\bin\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir Condition="!$(Configuration.StartsWith('AVX'))">$(SolutionDir)..\bin\$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.EndsWith('Release'))">
